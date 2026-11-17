@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vinicius Fontenele — Designer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+<meta name="description" id="metaDesc" content="Vinicius Fontenele — UX, product, graphic e 3D design em São Paulo. Portfólio em construção.">
+<style>
+  :root { --bg:#111; --fg:#f4f4f2; --dim:#8a8a86; --grey:#9b9b97; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { background:var(--bg); }
+  body {
+    background:var(--bg); color:var(--fg);
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    overflow-x:hidden;
+  }
+  /* Primeira tela: faixa + hero + rodapé ocupam exatamente a altura da janela */
+  .screen { min-height:100vh; min-height:100dvh; display:flex; flex-direction:column; justify-content:space-between; }
+
+  /* Faixa em loop infinito: duas cópias idênticas, desliza exatamente metade do trilho */
+  .marquee { border-bottom:1px solid #2a2a2a; overflow:hidden; white-space:nowrap; padding:10px 0; font-size:14px; letter-spacing:.04em; }
+  .track { display:flex; width:max-content; animation:slide 60s linear infinite; }
+  .track span { flex:none; }
+  @keyframes slide { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+
+  /* Hero */
+  .hero { flex:1; display:flex; flex-direction:column; justify-content:center; }
+  /* Triângulo invertido que indica "tem mais conteúdo abaixo" */
+  .scroll { grid-column:2; justify-self:center; padding:0 8px; background:none; border:0; color:var(--fg); cursor:var(--cur-hover); opacity:0; transition:opacity .6s; }
+  .scroll.show { opacity:1; }
+  .scroll svg { display:block; width:clamp(40px,5.4vw,76px); height:auto; animation:bob 1.6s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform:translateY(-7px); } 50% { transform:translateY(7px); } }
+  main { padding:4vw; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.4fr); gap:4vw; align-items:center; }
+  /* Cada linha "Olá" tem uma fonte própria e o tamanho é ajustado por JS (fitHello)
+     para todas terminarem na mesma largura, formando um bloco alinhado. */
+  .hello { min-width:0; font-family:"Helvetica Neue",Arial,sans-serif; font-weight:700; font-size:60px; line-height:1; letter-spacing:-.01em; }
+  .hello span { display:block; white-space:nowrap; }
+  .hello span:nth-child(1) { font-family:"Helvetica Neue",Arial,sans-serif; font-weight:700; }
+  .hello span:nth-child(2) { font-family:"Arial Narrow","Helvetica Neue Condensed","Helvetica Neue",Arial,sans-serif; font-weight:700; }
+  .hello span:nth-child(3) { font-family:"Helvetica Neue",Arial,sans-serif; font-weight:400; }
+  .hello span:nth-child(4) { font-family:"Helvetica Neue",Arial,sans-serif; font-weight:700; }
+  .hello span:nth-child(5) { font-family:Georgia,"Times New Roman",serif; font-weight:400; }
+  .right { display:flex; flex-direction:column; align-items:flex-end; text-align:right; gap:1.2vw; visibility:hidden; }
+  .skills { font-size:clamp(20px,3.2vw,46px); color:var(--grey); text-decoration:line-through; text-decoration-thickness:2px; letter-spacing:.01em; }
+  .role { font-family:Georgia,"Times New Roman",serif; font-weight:400; font-size:clamp(56px,min(12vw,22vh),190px); line-height:.95; letter-spacing:-.02em; }
+  .place { font-size:clamp(16px,2.4vw,34px); color:var(--grey); }
+  .place .in { font-style:italic; text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:.15em; }
+
+  footer { padding:4vw; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:16px; color:var(--grey); font-size:clamp(16px,1.6vw,22px); letter-spacing:.01em; font-style:italic; }
+  /* Seletor de idioma: interruptor (PT à esquerda, EN à direita) */
+  .lang { grid-column:3; justify-self:end; display:flex; align-items:center; gap:10px; font-style:normal; font-size:.85em; letter-spacing:.1em; }
+  .lang-opt { background:none; border:0; padding:6px 2px; font:inherit; letter-spacing:inherit; color:var(--grey); cursor:var(--cur-hover); transition:color .25s; }
+  .lang-opt:hover, .lang-opt:focus-visible, .lang-opt[aria-pressed="true"] { color:var(--fg); }
+  .lang-switch { position:relative; flex:none; width:46px; height:26px; padding:0; border-radius:999px; border:1.5px solid #3b3b3b; background:#242424; cursor:var(--cur-hover); transition:background .3s, border-color .3s; }
+  .lang-switch .knob { position:absolute; top:2px; left:2px; width:19px; height:19px; border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.55); transition:transform .3s cubic-bezier(.3,.7,.3,1); }
+  .lang-switch[aria-checked="true"] { background:#1f6b46; border-color:#2a8a5a; }
+  .lang-switch[aria-checked="true"] .knob { transform:translateX(20px); }
+  .lang-switch:focus-visible { outline:2px solid var(--fg); outline-offset:3px; }
+  .m-lang { grid-column:auto; justify-self:auto; margin-top:auto; padding-top:18px; font-size:13px; }
+  .from a { color:var(--fg); text-decoration:underline; text-decoration-thickness:1.5px; text-underline-offset:.2em; transition:color .2s; }
+  .from a:hover, .from a:focus-visible { color:#fff; }
+
+  /* Mini galeria (aparece ao passar o mouse em "Fortaleza") */
+  .gallery { position:fixed; left:4vw; bottom:90px; width:min(290px,calc(100vw - 8vw)); background:#161616; border:1px solid #2e2e2e; border-radius:12px; padding:8px; z-index:10; box-shadow:0 20px 60px rgba(0,0,0,.6);
+    visibility:hidden; opacity:0; transform:translateY(8px) scale(.98); transition:opacity .22s, transform .22s, visibility 0s .22s; }
+  .gallery.open { visibility:visible; opacity:1; transform:none; transition-delay:0s; }
+  .g-viewport { overflow:hidden; border-radius:8px; aspect-ratio:4/3; }
+  .g-track { display:flex; height:100%; transition:transform .5s cubic-bezier(.6,0,.2,1); }
+  .g-slide { flex:0 0 100%; position:relative; display:flex; align-items:flex-end; padding:10px; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--fg); }
+  .g-slide.dark { color:#1a1a1a; }
+  .g-slide img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .g-slide span { position:relative; z-index:1; text-shadow:0 1px 8px rgba(0,0,0,.45); }
+  .g-slide.dark span { text-shadow:none; }
+  .g-bar { display:flex; align-items:center; gap:8px; margin-top:8px; font-size:12px; color:var(--grey); font-style:normal; }
+  .g-bar #gCount { flex:1; text-align:center; }
+  .g-btn { background:none; border:1px solid #3a3a3a; color:var(--fg); width:28px; height:28px; border-radius:50%; cursor:var(--cur-hover); font-size:15px; line-height:1; }
+  .g-btn:hover, .g-btn:focus-visible { border-color:var(--fg); }
+
+  /* Bento grid de trabalhos: 3 colunas, o 3º bloco ocupa duas linhas (como no Readymag) */
+  .work { padding:2vw 4vw 8vw; } /* mesma margem lateral dos textos do hero */
+  .carousel { display:none; }
+  .bento { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1vw 1.9vw; }
+  .tile { position:relative; margin:0; overflow:hidden; border-radius:clamp(8px,1vw,14px); aspect-ratio:203/178;
+    opacity:0; transform:translateY(28px); transition:opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1); }
+  .tile.in { opacity:1; transform:none; }
+  .tile.t3 { grid-column:3; grid-row:1 / span 2; aspect-ratio:auto; }
+  .tile-in { position:absolute; inset:0; display:flex; align-items:flex-end; padding:12px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,.8);
+    transition:transform .7s cubic-bezier(.2,.7,.2,1); }
+  .tile-in img, .tile-in video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .tile:hover .tile-in { transform:scale(1.05); }
+
+  /* Legenda que sobe ao passar o mouse nos trabalhos que têm modal */
+  .openable { cursor:var(--cur-hover); }
+  .openable:focus-visible { outline:2px solid var(--fg); outline-offset:3px; }
+  .tile-cap { position:absolute; left:0; right:0; bottom:0; z-index:2; display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:clamp(14px,1.6vw,22px); color:#fff; background:linear-gradient(to top, rgba(0,0,0,.72), rgba(0,0,0,0));
+    transform:translateY(100%); opacity:0; pointer-events:none;
+    transition:transform .45s cubic-bezier(.2,.7,.2,1), opacity .45s; }
+  .openable:hover .tile-cap, .openable:focus-visible .tile-cap { transform:none; opacity:1; }
+  .tile-title { font-size:clamp(15px,1.5vw,22px); font-weight:600; letter-spacing:.01em; }
+  .tile-cap svg { width:clamp(18px,1.8vw,26px); height:auto; flex:none; transition:transform .35s; }
+  .openable:hover .tile-cap svg { transform:translate(3px,-3px); }
+  @media (hover:none) { .tile-cap { transform:none; opacity:1; } }
+
+  /* Modal do trabalho */
+  .modal { position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; padding:4vw;
+    visibility:hidden; opacity:0; transition:opacity .3s, visibility 0s .3s; }
+  .modal.open { visibility:visible; opacity:1; transition-delay:0s; }
+  .m-backdrop { position:absolute; inset:0; background:rgba(8,8,8,.82); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+  .m-panel { position:relative; width:min(1100px,100%); height:min(80vh,720px); height:min(80dvh,720px); background:#151515; border:1px solid #2a2a2a; border-radius:16px;
+    display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); overflow:hidden; transform:translateY(24px) scale(.98); transition:transform .4s cubic-bezier(.2,.7,.2,1); }
+  .modal.open .m-panel { transform:none; }
+  .m-close { position:absolute; top:12px; right:12px; z-index:6; width:40px; height:40px; border-radius:50%; border:1px solid #3a3a3a; background:rgba(0,0,0,.55); color:var(--fg); font-size:22px; line-height:1; cursor:var(--cur-hover); }
+  .m-close:hover, .m-close:focus-visible, .m-nav:hover, .m-nav:focus-visible { border-color:var(--fg); }
+  .m-gallery { position:relative; min-width:0; min-height:0; background:#0c0c0c; }
+  .m-viewport { height:100%; overflow:hidden; touch-action:pan-y; }
+  .m-track { display:flex; height:100%; transition:transform .5s cubic-bezier(.6,0,.2,1); }
+  .m-slide { position:relative; flex:0 0 100%; height:100%; display:flex; align-items:flex-end; padding:14px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,.75); }
+  .m-slide img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; user-select:none; -webkit-user-drag:none; }
+  .m-nav { position:absolute; top:50%; transform:translateY(-50%); z-index:3; width:40px; height:40px; border-radius:50%; border:1px solid #3a3a3a; background:rgba(0,0,0,.55); color:var(--fg); font-size:17px; cursor:var(--cur-hover); }
+  .m-prev { left:12px; } .m-next { right:12px; }
+  .m-dots { position:absolute; left:0; right:0; bottom:14px; z-index:3; display:flex; justify-content:center; gap:8px; }
+  .m-dots i { width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.35); transition:background .3s, transform .3s; }
+  .m-dots i.on { background:#fff; transform:scale(1.25); }
+  .m-text { min-width:0; padding:clamp(22px,3vw,40px); overflow:auto; display:flex; flex-direction:column; gap:14px; }
+  .m-kicker { font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--grey); }
+  .m-text h2 { font-family:Georgia,"Times New Roman",serif; font-weight:400; font-size:clamp(28px,3.4vw,46px); line-height:1.05; letter-spacing:-.01em; }
+  .m-body { display:flex; flex-direction:column; gap:12px; font-size:clamp(14px,1.15vw,16px); line-height:1.65; color:#cfcfca; }
+  @media (max-width:760px) {
+    .modal { padding:0; align-items:flex-end; }
+    .m-panel { width:100%; height:92vh; height:92dvh; border-radius:16px 16px 0 0; grid-template-columns:minmax(0,1fr); grid-template-rows:42% minmax(0,1fr); }
+  }
+
+  /* Celular: o grid vira um carrossel infinito, sempre deslizando (igual à faixa do topo) */
+  @media (max-width:760px) {
+    .work { padding:4vw 0 10vw; }
+    .bento { display:none; }
+    .carousel { display:block; overflow:hidden; }
+    .c-track { display:flex; width:max-content; animation:slide 60s linear infinite; }
+    .c-group { display:flex; gap:3vw; padding-right:3vw; }
+    .c-item { position:relative; flex:none; width:62vw; aspect-ratio:4/5; overflow:hidden; border-radius:clamp(8px,1vw,14px); }
+  }
+  @media (max-width:760px) { footer { font-size:14px; gap:8px; } .from { white-space:nowrap; } }
+  @media (max-width:760px) { main { grid-template-columns:minmax(0,1fr); gap:6vw; } }
+  @media (prefers-reduced-motion:reduce) { .track, .scroll svg, .c-track { animation:none; } .carousel { overflow-x:auto; } .g-track, .gallery, .tile, .tile-in, .tile-cap, .modal, .m-panel, .m-track, .knob, .lang-switch { transition:none; } }
+
+  /* ===== Currículo: experiência, destaques, formação, skills e contato ===== */
+  :root { --cond:"Oswald","Arial Narrow","Helvetica Neue Condensed",Arial,sans-serif; }
+  .info { padding:6vw 4vw 5vw; font-family:var(--cond); font-weight:400; display:flex; flex-direction:column; gap:7vw; }
+  .rv { opacity:0; transform:translateY(26px); transition:opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1); }
+  .rv.in { opacity:1; transform:none; }
+  .h2 { font-family:var(--cond); font-weight:400; font-size:clamp(34px,4.6vw,78px); line-height:1.05; margin-bottom:.35em; }
+  .h2.to-right { text-align:right; }
+  .company { font-weight:400; font-size:clamp(40px,5.6vw,92px); line-height:1.05; margin-top:.45em; }
+  .row { display:flex; align-items:flex-end; gap:.45em; font-size:clamp(22px,3vw,50px); line-height:1.15; }
+  .row.big { font-size:clamp(24px,3.2vw,54px); }
+  .row > span:last-child { white-space:nowrap; }
+  .row a { color:inherit; text-decoration:none; }
+  .row a:hover { text-decoration:underline; text-underline-offset:.12em; }
+  /* linha pontilhada entre o texto da esquerda e o da direita */
+  .lead { flex:1; min-width:1.2em; height:0; margin-bottom:.3em; border-bottom:.09em dotted currentColor; opacity:.85; }
+  .row3 { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(1.2em,.6fr) auto; column-gap:.5em; align-items:end; font-size:clamp(22px,3vw,50px); line-height:1.1; margin-bottom:.35em; }
+  .row3 > span:last-child { text-align:right; white-space:nowrap; }
+
+  .circles { display:flex; flex-direction:column; align-items:center; gap:2.4vw; margin-top:3vw; }
+  .c-row { display:flex; justify-content:center; gap:2.4vw; }
+  @media (max-width:760px) { .circles .circle { width:19vw; } .c-row { gap:2vw; } }
+  .circle { width:clamp(96px,17vw,260px); height:auto; flex:none; }
+  .circle text { font-family:var(--cond); font-weight:500; fill:#fff; }
+
+  /* faixas de posts do Instagram: deslizam sozinhas, em loop; a segunda corre ao contrário */
+  .strip { overflow:hidden; margin:3vw -4vw 0; }
+  .s-track { display:flex; width:max-content; animation:slide 60s linear infinite; }
+  .strip.rev .s-track { animation-direction:reverse; }
+  .strip:hover .s-track { animation-play-state:paused; }
+  .s-group { display:flex; gap:3px; padding-right:3px; }
+  .post { position:relative; flex:none; width:clamp(150px,19vw,300px); aspect-ratio:4/5; overflow:hidden; display:flex; align-items:flex-end; padding:10px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; }
+  .post img, .it img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .post span, .it span { position:relative; z-index:1; }
+
+  /* colagem do site e das redes (proporções copiadas do Readymag) */
+  .site { display:grid; grid-template-columns:143fr 143fr 93fr 94fr; grid-template-rows:86fr 86fr 72fr 72fr 72fr; column-gap:1.4%; row-gap:2%; aspect-ratio:473/424; margin-top:3vw; }
+  .it { position:relative; overflow:hidden; border-radius:4px; display:flex; align-items:flex-end; padding:8px; font-size:11px; letter-spacing:.08em; text-transform:uppercase; }
+  .it img { object-position:top; }
+  .it:nth-child(1) { grid-column:1; grid-row:1 / span 5; }
+  .it:nth-child(2) { grid-column:2; grid-row:1 / span 3; }
+  .it:nth-child(3) { grid-column:3; grid-row:1; }
+  .it:nth-child(4) { grid-column:4; grid-row:1; }
+  .it:nth-child(5) { grid-column:3; grid-row:2; }
+  .it:nth-child(6) { grid-column:4; grid-row:2; }
+  .it:nth-child(7) { grid-column:3 / span 2; grid-row:3; }
+  .it:nth-child(8) { grid-column:3 / span 2; grid-row:4; }
+  .it:nth-child(9) { grid-column:3 / span 2; grid-row:5; }
+
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:4vw; }
+  .two ul { list-style:none; display:flex; flex-direction:column; gap:.3em; font-size:clamp(22px,3vw,50px); line-height:1.15; }
+  .two .soft { text-align:right; }
+  .contact { font-size:clamp(18px,2vw,30px); line-height:1.3; }
+  .contact a { color:inherit; text-decoration:none; }
+  .contact a:hover { text-decoration:underline; text-underline-offset:.15em; }
+
+  @media (prefers-reduced-motion:reduce) {
+    .rv { opacity:1; transform:none; transition:none; }
+    .s-track { animation:none; }
+    .strip { overflow-x:auto; }
+  }
+
+  .circle { border-radius:50%; }
+  .spin { animation:spin 22s linear infinite; }
+  .spin.s2 { animation-duration:28s; } .spin.s3 { animation-duration:25s; } .spin.rev { animation-direction:reverse; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  @media (prefers-reduced-motion:reduce) { .spin { animation:none; } }
+  /* switch de idioma fixo na parte de baixo da tela */
+  .lang { position:fixed; right:max(16px,2.2vw); bottom:max(14px,2vh); z-index:60; padding:7px 14px; border-radius:999px; background:rgba(17,17,17,.72); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); border:1px solid #2c2c2c; }
+  .m-lang { position:static; z-index:auto; padding:18px 0 0; background:none; border:0; -webkit-backdrop-filter:none; backdrop-filter:none; }
+  .work-title { margin-bottom:.5em; }
+  @media (max-width:760px) { .work-title { padding:0 4vw; } }
+  .work { padding-top:6vw; }
+  /* setas do carrossel do modal só aparecem com o mouse por cima */
+  @media (hover:hover) {
+    .m-nav { opacity:0; pointer-events:none; transition:opacity .25s, border-color .2s; }
+    .m-gallery:hover .m-nav, .m-nav:focus-visible { opacity:1; pointer-events:auto; }
+  }
+
+  /* seção: cartão de visitas */
+  .card-sec { padding:6vw 4vw 0; display:grid; grid-template-columns:minmax(0,5fr) minmax(0,7fr); gap:4vw; align-items:center; }
+  .cs-kicker { font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); margin-bottom:1.2em; }
+  .cs-text .h2 { font-size:clamp(34px,4vw,68px); margin-bottom:.6em; }
+  .cs-body { font-size:clamp(16px,1.35vw,20px); line-height:1.65; color:#cfcfcb; max-width:34em; }
+  .cs-img { border-radius:12px; overflow:hidden; background:#1b1b1b; }
+  .cs-img img { display:block; width:100%; height:auto; }
+  @media (max-width:760px) { .card-sec { grid-template-columns:minmax(0,1fr); gap:6vw; padding-top:14vw; } }
+
+  /* comparador antes/depois: o mouse move a divisória */
+  .ba { position:relative; --pos:50%; cursor:var(--cur-mouse); touch-action:pan-y; user-select:none; -webkit-user-select:none; outline-offset:4px; }
+  .ba img { display:block; width:100%; height:auto; pointer-events:none; }
+  .ba .ba-before { position:absolute; inset:0; height:100%; object-fit:cover; clip-path:inset(0 calc(100% - var(--pos)) 0 0); }
+  .ba-line { position:absolute; top:0; bottom:0; left:var(--pos); width:2px; margin-left:-1px; background:#fff; box-shadow:0 0 12px rgba(0,0,0,.45); pointer-events:none; }
+  .ba-knob { position:absolute; top:50%; left:50%; width:46px; height:46px; margin:-23px 0 0 -23px; border-radius:50%; background:#fff; color:#111; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 18px rgba(0,0,0,.4); transition:transform .25s; }
+  .ba:hover .ba-knob, .ba.drag .ba-knob { transform:scale(1.1); }
+  .ba-tag { position:absolute; top:14px; padding:6px 12px; border-radius:999px; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#fff; background:rgba(17,17,17,.62); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); pointer-events:none; }
+  .ba-tag-b { left:14px; } .ba-tag-a { right:14px; }
+
+  /* cursores personalizados (só em dispositivos com mouse) */
+  :root { --cur-mouse:url(img/cursor-mouse.svg) 2 1, auto; --cur-hover:url(img/cursor-hover.svg) 10 1, pointer; }
+  @media (hover:hover) and (pointer:fine) {
+    html, body { cursor:var(--cur-mouse); }
+    a, a *, button, button *, [role="button"], [role="switch"], summary, label, select, .openable, .openable * { cursor:var(--cur-hover); }
+  }
+
+  /* ícones gráficos */
+  :root { --rot:0; }
+  .m-ico { display:inline-block; height:1.15em; width:auto; margin:0 1em; vertical-align:-.22em; animation:spin 14s linear infinite; }
+  .h2.has-ico::before { content:""; display:inline-block; width:.62em; height:.62em; margin-right:.32em; vertical-align:.02em; background:var(--ico) center/contain no-repeat; animation:spin 14s linear infinite; animation-direction:var(--dir, normal); }
+  .info { overflow-x:clip; }
+  .contact { position:relative; min-height:clamp(140px,20vw,300px); margin-bottom:56px; }
+  .big-ico { position:absolute; right:0; bottom:0; width:clamp(120px,20vw,300px); height:auto; transform:rotate(calc(var(--rot) * -1.3deg)); pointer-events:none; }
+  @media (prefers-reduced-motion:reduce) { .m-ico { animation:none; } .h2.has-ico::before { animation:none; } .big-ico { transform:none; } }
+</style>
+</head>
+<body>
+  <div class="screen">
+  <div class="marquee" aria-hidden="true"><div class="track" id="track"></div></div>
+
+  <section class="hero">
+  <main>
+    <div class="hello" id="hello" data-i18n-aria="hello" aria-label="Olá">
+      <span data-text="Olá™€•​‘̃¬¶"></span>
+      <span data-text="=+Olá@:&amp;µ¬¬"></span>
+      <span data-text="˚–”Olá©’⁄‹"></span>
+      <span data-text="#●◊□Olá≠"></span>
+      <span data-text="\©»º¥Olá"></span>
+    </div>
+
+    <div class="right" id="right">
+      <p class="skills" data-text="ux / product / graphic / 3d" aria-label="ux, product, graphic, 3d"></p>
+      <h1 class="role" data-text="designer" aria-label="designer"></h1>
+      <p class="place" aria-label="em São Paulo"><span class="in" data-text="in"></span> <span data-text="são paulo"></span></p>
+    </div>
+  </main>
+
+  </section>
+
+  <footer>
+    <span class="from">from <a id="fortaleza" href="https://www.google.com/maps/place/Fortaleza,+CE" target="_blank" rel="noopener">Fortaleza - CE</a></span>
+    <button class="scroll" id="scrollDown" data-i18n-aria="scroll" aria-label="Rolar para baixo">
+      <svg viewBox="0 0 64 56" aria-hidden="true"><path d="M5 5 H59 L32 51 Z" fill="currentColor" stroke="currentColor" stroke-width="6" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="lang" role="group" data-i18n-aria="lang" aria-label="Idioma">
+      <button type="button" class="lang-opt" data-lang="pt" aria-pressed="true">PT</button>
+      <button type="button" class="lang-switch" role="switch" aria-checked="false" data-i18n-aria="langSwitch" aria-label="Inglês"><span class="knob"></span></button>
+      <button type="button" class="lang-opt" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </footer>
+  </div>
+
+  <section class="work" id="trabalhos" data-i18n-aria="works" aria-label="Trabalhos"><h2 class="h2 work-title">3D</h2><div class="bento" id="bento"></div><div class="carousel" id="carousel"></div></section>
+
+  <section class="card-sec" aria-labelledby="cardTitle">
+    <div class="cs-text rv">
+      <p class="cs-kicker" data-i18n="csKicker">Design gráfico</p>
+      <h2 class="h2 scr" id="cardTitle" data-i18n="csTitle">Criação de Cartão de Visitas - SRV Gás</h2>
+      <p class="cs-body" data-i18n="csBody"></p>
+    </div>
+    <figure class="cs-img ba rv" id="ba" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" data-i18n-aria="baLabel" aria-label="Comparar antes e depois">
+      <img class="ba-after" src="img/cartao-srv.jpg" data-alt="csAlt" alt="" width="1600" height="1200" loading="lazy" draggable="false">
+      <img class="ba-before" src="img/cartao-srv-antes.jpg" data-alt="csAltBefore" alt="" width="1600" height="1200" loading="lazy" draggable="false">
+      <span class="ba-tag ba-tag-b" data-i18n="baBefore">Antes</span><span class="ba-tag ba-tag-a" data-i18n="baAfter">Depois</span>
+      <span class="ba-line" aria-hidden="true"><i class="ba-knob"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6"/></svg></i></span>
+    </figure>
+  </section>
+
+  <section class="info" aria-label="Currículo e trabalhos">
+
+    <div class="block rv">
+      <h2 class="h2 scr" data-i18n="hExp">Experiências Profissionais</h2>
+      <h3 class="company">GWA Informática</h3>
+      <p class="row"><span data-i18n="roleDesigner">Designer</span><i class="lead"></i><span data-i18n="dateGwa1">01/2026 - atual</span></p>
+      <p class="row"><span data-i18n="roleIntern">Estagiário de Design</span><i class="lead"></i><span>04/2025 - 12/2025</span></p>
+      <h3 class="company">PagBank</h3>
+      <p class="row"><span data-i18n="rolePag">Aprendiz Ux &amp; Product Design</span><i class="lead"></i><span>04/2023 - 07/2024</span></p>
+    </div>
+
+    <div class="block rv">
+      <p class="row big"><span><span data-i18n="highlights">Destaques</span> <span>@gwainformatica</span></span><i class="lead"></i><span data-i18n="proposal">(proposta)</span></p>
+      <div class="circles">
+        <div class="c-row"><img class="circle spin s1" src="img/destaque-desenvolvimento.png" alt="Destaque: Desenvolvimento" width="480" height="480"><img class="circle spin s2 rev" src="img/destaque-design-marketing.png" alt="Destaque: Design e Marketing" width="480" height="480"><img class="circle spin s3" src="img/destaque-suporte.png" alt="Destaque: Suporte" width="480" height="480"></div>
+        <div class="c-row"><img class="circle " src="img/destaque-visitas.png" alt="Destaque: Visitas" width="480" height="480"><img class="circle " src="img/destaque-sobre-nos.png" alt="Destaque: Sobre nós" width="480" height="480"><img class="circle " src="img/destaque-feedbacks.png" alt="Destaque: Feedbacks" width="480" height="480"><img class="circle " src="img/destaque-contatos.png" alt="Destaque: Contatos" width="480" height="480"></div>
+      </div>
+    </div>
+
+    <div class="block rv">
+      <p class="row big"><span>@gwainformatica</span><i class="lead"></i><span>instagram</span></p>
+      <div class="strip" id="stripGwa" role="group" data-i18n-aria="igGwa" aria-label="Posts do Instagram da GWA Informática"></div>
+    </div>
+
+    <div class="block rv">
+      <p class="row big"><span>@vertas.ambiental</span><i class="lead"></i><span>instagram</span></p>
+      <div class="strip" id="stripVertas" role="group" data-i18n-aria="igVertas" aria-label="Posts do Instagram da Vertas"></div>
+    </div>
+
+    <div class="block rv">
+      <p class="row big"><span>@srvgas</span><i class="lead"></i><span>instagram</span></p>
+      <div class="strip" id="stripSrv" role="group" data-i18n-aria="igSrv" aria-label="Posts do Instagram da SRV Gás"></div>
+    </div>
+
+    <div class="block rv">
+      <h2 class="h2 scr" data-i18n="hAcad">Experiência Acadêmica</h2>
+      <p class="row3"><span data-i18n="postgrad">Pós-graduação em UX/UI e Produtos Digitais</span><i class="lead"></i><span>EBAC</span></p>
+      <p class="row3"><span>04/2026</span><i class="lead"></i><span data-i18n="inProgress">em andamento</span></p>
+      <p class="row3"><span data-i18n="bachelor">Bacharel em Design</span><i class="lead"></i><span>USJT</span></p>
+      <p class="row3"><span>01/2023</span><i class="lead"></i><span>12/2025</span></p>
+    </div>
+
+    <div class="block rv">
+      <h2 class="h2 scr" data-i18n="hCert">Certificados</h2>
+      <p class="row3"><span>UX &amp; Design</span><i class="lead"></i><span>Alura</span></p>
+      <p class="row3"><span>Figma</span><i class="lead"></i><span>EBAC</span></p>
+      <p class="row3"><span>Branding</span><i class="lead"></i><span>EBAC</span></p>
+      <p class="row3"><span data-i18n="certIdentity">Identidade Visual</span><i class="lead"></i><span>EBAC</span></p>
+    </div>
+
+    <div class="block two rv">
+      <div>
+        <h2 class="h2 scr" data-i18n="hHard">Hardskills</h2>
+        <ul><li>Blender</li><li>Figma</li><li>A. Illustrator</li><li>A. Photoshop</li><li>A. After Effects</li></ul>
+      </div>
+      <div class="soft">
+        <h2 class="h2 scr" data-i18n="hSoft">Softskills</h2>
+        <ul><li data-i18n="s1">Adaptabilidade</li><li data-i18n="s2">Flexibilidade</li><li data-i18n="s3">Empatia</li><li data-i18n="s4">Comunicação</li><li data-i18n="s5">Pensamento Crítico</li></ul>
+      </div>
+    </div>
+
+    <div class="contact rv">
+      <img class="big-ico" id="bigIco" src="" alt="" width="382" height="413" draggable="false">
+      <p data-i18n="contact">Contato:</p>
+      <p><a href="mailto:emmersonvinicius@gmail.com">emmersonvinicius@gmail.com</a></p>
+      <p><a href="tel:+5511949925368">+55 11 94992-5368</a></p>
+    </div>
+
+  </section>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle" aria-hidden="true">
+    <div class="m-backdrop" id="mBackdrop"></div>
+    <div class="m-panel">
+      <button class="m-close" id="mClose" data-i18n-aria="close" aria-label="Fechar">×</button>
+      <div class="m-gallery" id="mGallery">
+        <div class="m-viewport" id="mViewport"><div class="m-track" id="mTrack"></div></div>
+        <button class="m-nav m-prev" id="mPrev" data-i18n-aria="prevImg" aria-label="Imagem anterior">←</button>
+        <button class="m-nav m-next" id="mNext" data-i18n-aria="nextImg" aria-label="Próxima imagem">→</button>
+        <div class="m-dots" id="mDots" aria-hidden="true"></div>
+      </div>
+      <div class="m-text">
+        <p class="m-kicker" id="mKicker"></p>
+        <h2 id="mTitle"></h2>
+        <div class="m-body" id="mBody"></div>
+        <div class="lang m-lang" role="group" data-i18n-aria="lang" aria-label="Idioma">
+      <button type="button" class="lang-opt" data-lang="pt" aria-pressed="true">PT</button>
+      <button type="button" class="lang-switch" role="switch" aria-checked="false" data-i18n-aria="langSwitch" aria-label="Inglês"><span class="knob"></span></button>
+      <button type="button" class="lang-opt" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gallery" id="gallery" role="dialog" data-i18n-aria="galleryLabel" aria-label="Fotos de Fortaleza" aria-hidden="true">
+    <div class="g-viewport"><div class="g-track" id="gTrack"></div></div>
+    <div class="g-bar">
+      <button class="g-btn" id="gPrev" data-i18n-aria="prevPhoto" aria-label="Foto anterior">←</button>
+      <span id="gCount">1 / 1</span>
+      <button class="g-btn" id="gNext" data-i18n-aria="nextPhoto" aria-label="Próxima foto">→</button>
+    </div>
+  </div>
+
+<script>
+  // ---- Idioma (PT / EN) ----
+  var UI = {
+    pt: { scroll:'Rolar para baixo', works:'Trabalhos', close:'Fechar', prevImg:'Imagem anterior', nextImg:'Próxima imagem',
+          galleryLabel:'Fotos de Fortaleza', prevPhoto:'Foto anterior', nextPhoto:'Próxima foto', lang:'Idioma', langSwitch:'Inglês', hello:'Olá',
+          csKicker:'Design gráfico', baLabel:'Comparar antes e depois do cartão', baBefore:'Antes', baAfter:'Depois', csAltBefore:'Cartão de visitas da SRV Gás antes da atualização, com a identidade visual antiga', csTitle:'Criação de Cartão de Visitas - SRV Gás',
+          csBody:'A equipe da SRV Gás me procurou para atualizar o cartão de visitas, que estava defasado em relação à nova identidade visual da marca. Depois de definirmos as informações essenciais para o material, parti para a produção e a síntese de uma peça reconhecível para a marca.',
+          csAlt:'Cartão de visitas da SRV Gás, frente e verso, sobre uma superfície clara',
+          hExp:'Experiências Profissionais', roleDesigner:'Designer', dateGwa1:'01/2026 - atual', roleIntern:'Estagiário de Design',
+          rolePag:'Aprendiz Ux & Product Design', highlights:'Destaques', proposal:'(proposta)',
+          hAcad:'Experiência Acadêmica', postgrad:'Pós-graduação em UX/UI e Produtos Digitais', inProgress:'em andamento', bachelor:'Bacharel em Design',
+          hCert:'Certificados', certIdentity:'Identidade Visual', hHard:'Hardskills', hSoft:'Softskills',
+          s1:'Adaptabilidade', s2:'Flexibilidade', s3:'Empatia', s4:'Comunicação', s5:'Pensamento Crítico', contact:'Contato:',
+          igGwa:'Posts do Instagram da GWA Informática', igVertas:'Posts do Instagram da Vertas', altVertas:'Post do Instagram da Vertas', igSrv:'Posts do Instagram da SRV Gás', siteLabel:'Peças de design do site e das redes da SRV Gás',
+          altGwa:'Post do Instagram da GWA Informática', altSrv:'Post do Instagram da SRV Gás', altSite:'Peça de design do site e das redes da SRV Gás',
+          open:'Abrir: ', image:'Imagem ',
+          metaDesc:'Vinicius Fontenele — UX, product, graphic e 3D design em São Paulo.' },
+    en: { scroll:'Scroll down', works:'Works', close:'Close', prevImg:'Previous image', nextImg:'Next image',
+          galleryLabel:'Photos of Fortaleza', prevPhoto:'Previous photo', nextPhoto:'Next photo', lang:'Language', langSwitch:'English', hello:'Hello',
+          csKicker:'Graphic design', baLabel:'Compare the card before and after', baBefore:'Before', baAfter:'After', csAltBefore:'SRV Gás business card before the update, with the old visual identity', csTitle:'Business Card Design - SRV Gás',
+          csBody:'The SRV Gás team asked me to update their business card, which was out of date with the brand’s new visual identity. After defining the essential information for the piece, I moved on to producing and distilling a card that is recognizable as the brand.',
+          csAlt:'SRV Gás business card, front and back, on a light surface',
+          hExp:'Professional Experience', roleDesigner:'Designer', dateGwa1:'01/2026 - present', roleIntern:'Design Intern',
+          rolePag:'UX & Product Design Apprentice', highlights:'Highlights', proposal:'(proposal)',
+          hAcad:'Academic Background', postgrad:'Postgraduate Degree in UX/UI and Digital Products', inProgress:'in progress', bachelor:"Bachelor's Degree in Design",
+          hCert:'Certificates', certIdentity:'Visual Identity', hHard:'Hard skills', hSoft:'Soft skills',
+          s1:'Adaptability', s2:'Flexibility', s3:'Empathy', s4:'Communication', s5:'Critical Thinking', contact:'Contact:',
+          igGwa:'Instagram posts by GWA Informática', igVertas:'Instagram posts by Vertas', altVertas:'Instagram post by Vertas', igSrv:'Instagram posts by SRV Gás', siteLabel:'Design pieces for the SRV Gás website and social media',
+          altGwa:'Instagram post by GWA Informática', altSrv:'Instagram post by SRV Gás', altSite:'Design piece for the SRV Gás website and social media',
+          open:'Open: ', image:'Image ',
+          metaDesc:'Vinicius Fontenele — UX, product, graphic and 3D design in São Paulo.' }
+  };
+  var LANG = 'pt';
+  (function () {
+    // 1ª visita: usa o idioma do navegador; depois, a escolha salva no seletor
+    LANG = ((navigator.language || 'pt').toLowerCase().indexOf('pt') === 0) ? 'pt' : 'en';
+    try { var saved = localStorage.getItem('lang'); if (saved === 'pt' || saved === 'en') LANG = saved; } catch (e) {}
+  })();
+  var langFns = [];
+  function UIS(k) { return UI[LANG][k]; }
+  // textos do conteúdo podem ser { pt: '...', en: '...' } ou um texto simples (igual nos dois idiomas)
+  function T(v) { return (v && typeof v === 'object' && !Array.isArray(v)) ? (v[LANG] || v.pt) : v; }
+  function onLang(fn) { langFns.push(fn); fn(); }
+  function setLang(l, save) {
+    LANG = l;
+    if (save) { try { localStorage.setItem('lang', l); } catch (e) {} }
+    document.documentElement.lang = (l === 'pt') ? 'pt-BR' : 'en';
+    document.getElementById('metaDesc').setAttribute('content', UIS('metaDesc'));
+    Array.prototype.forEach.call(document.querySelectorAll('[data-i18n-aria]'), function (el) {
+      el.setAttribute('aria-label', UIS(el.getAttribute('data-i18n-aria')));
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.lang [data-lang]'), function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-lang') === l ? 'true' : 'false');
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-i18n]'), function (el) {
+      el.textContent = UIS(el.getAttribute('data-i18n'));
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-alt]'), function (el) {
+      el.alt = UIS(el.getAttribute('data-alt'));
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.lang-switch'), function (sw) {
+      sw.setAttribute('aria-checked', l === 'en' ? 'true' : 'false');
+    });
+    langFns.forEach(function (fn) { fn(); });
+  }
+
+  // ---- Ícones gráficos (arquivos em img/icons/) ----
+  var ICONS = [
+    { src: 'img/icons/icon-02.png', w: 382, h: 413 },
+    { src: 'img/icons/icon-03.png', w: 387, h: 362 },
+    { src: 'img/icons/icon-04.png', w: 387, h: 387 },
+    { src: 'img/icons/icon-05.png', w: 444, h: 444 },
+    { src: 'img/icons/icon-06.png', w: 479, h: 479 }
+  ];
+
+  // ---- Faixa infinita ----
+  (function () {
+    var track = document.getElementById('track');
+    // Ícones do site: para incluir mais, coloque o arquivo em img/icons/ e acrescente o nome aqui.
+    var words = ['Vinicius Fontenele', 'Portfolio'];
+    function half() {
+      var span = document.createElement('span');
+      var k = 0;
+      for (var r = 0; r < 20; r++) { // cada metade precisa ser mais larga que a tela
+        words.forEach(function (w) {
+          span.appendChild(document.createTextNode(w));
+          var im = document.createElement('img');
+          im.className = 'm-ico';
+          im.src = ICONS[k % ICONS.length].src;
+          im.width = ICONS[k % ICONS.length].w; im.height = ICONS[k % ICONS.length].h;
+          im.alt = ''; im.draggable = false;
+          span.appendChild(im);
+          k++;
+        });
+      }
+      return span;
+    }
+    var a = half(), b = half();
+    track.appendChild(a); track.appendChild(b);
+    // velocidade constante (px por segundo), independente do tamanho da tela
+    var pxPerSecond = 40;
+    var seconds = a.getBoundingClientRect().width / pxPerSecond;
+    track.style.animationDuration = seconds + 's';
+  })();
+
+  // ---- Efeito de letras embaralhadas ----
+  var glyphs = '#@&%$§¶€≠◊□●=+/\\';
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function scramble(el, finalText, total, onDone) {
+    var chars = Array.from(finalText);
+    if (reduce) { el.textContent = finalText; if (onDone) onDone(); return; }
+    var frame = 0;
+    var t = setInterval(function () {
+      var out = '';
+      for (var i = 0; i < chars.length; i++) {
+        out += (chars[i] === ' ' || i < (frame / total) * chars.length)
+          ? chars[i] : glyphs[Math.floor(Math.random() * glyphs.length)];
+      }
+      el.textContent = out;
+      if (++frame > total) {
+        clearInterval(t);
+        el.textContent = finalText;
+        if (onDone) onDone();
+      }
+    }, 30);
+  }
+
+  // 27 quadros x 30 ms = ~0,8 s por etapa
+  var FRAMES = 27;
+  var helloLines = Array.prototype.slice.call(document.querySelectorAll('#hello span'));
+  var rightItems = Array.prototype.slice.call(document.querySelectorAll('#right [data-text]'));
+  var right = document.getElementById('right');
+
+  // texto final de cada linha do bloco, conforme o idioma ("Olá" vira "Hello" em inglês)
+  function helloFinal(el) {
+    var t = el.getAttribute('data-text');
+    return LANG === 'en' ? t.replace('Olá', 'Hello') : t;
+  }
+
+  // reserva o espaço antes de animar, para a página não "pular"
+  helloLines.forEach(function (el) { el.textContent = helloFinal(el); });
+  rightItems.forEach(function (el) { el.textContent = el.getAttribute('data-text'); });
+
+  // Ajusta o tamanho de cada linha "Olá" para todas ficarem com a mesma largura do bloco
+  function fitHello() {
+    var W = document.getElementById('hello').clientWidth;
+    if (!W) return;
+    helloLines.forEach(function (el) {
+      var finalText = helloFinal(el);
+      var current = el.textContent;
+      el.textContent = finalText;
+      el.style.fontSize = '100px';
+      el.style.display = 'inline-block';
+      var w = el.getBoundingClientRect().width;
+      el.style.display = '';
+      el.style.fontSize = (100 * W / w) + 'px';
+      el.textContent = current;
+    });
+
+    // Limita a altura do bloco para o hero caber na tela sem rolagem
+    // (só no layout de duas colunas; no celular as colunas ficam empilhadas)
+    if (window.innerWidth > 760) {
+      var m = document.querySelector('main');
+      var pad = parseFloat(getComputedStyle(m).paddingTop) * 2;
+      var avail = window.innerHeight
+        - document.querySelector('.marquee').offsetHeight
+        - document.querySelector('footer').offsetHeight - pad;
+      var H = document.getElementById('hello').getBoundingClientRect().height;
+      if (avail > 0 && H > avail * 0.95) {
+        var f = (avail * 0.95) / H;
+        helloLines.forEach(function (el) {
+          el.style.fontSize = (parseFloat(el.style.fontSize) * f) + 'px';
+        });
+      }
+    }
+  }
+  fitHello();
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(fitHello); }
+  window.addEventListener('resize', fitHello);
+
+  var scrollBtn = document.getElementById('scrollDown');
+  scrollBtn.addEventListener('click', function () {
+    document.getElementById('trabalhos').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  });
+
+  var heroDone = false;
+  function showRight() {
+    heroDone = true;
+    right.style.visibility = 'visible';
+    scrollBtn.classList.add('show');
+    rightItems.forEach(function (el) { scramble(el, el.getAttribute('data-text'), FRAMES); });
+  }
+
+  // 1ª etapa: as cinco linhas "Olá" ao mesmo tempo. 2ª etapa: o texto da direita.
+  var finished = 0;
+  helloLines.forEach(function (el) {
+    scramble(el, helloFinal(el), FRAMES, function () {
+      if (++finished === helloLines.length) showRight();
+    });
+  });
+
+  // ao trocar o idioma: reajusta o tamanho das linhas e refaz a animação do bloco "Olá" / "Hello"
+  onLang(function () {
+    if (!heroDone) return;
+    fitHello();
+    helloLines.forEach(function (el) { scramble(el, helloFinal(el), FRAMES); });
+  });
+
+  // ---- Galeria de Fortaleza (abre ao passar o mouse; no celular, ao tocar) ----
+  // Para usar fotos de verdade: preencha "src" com o caminho da imagem (ex.: 'img/iracema.jpg').
+  // Enquanto "src" estiver vazio, aparece um bloco colorido com o nome do lugar.
+  var photos = [
+    { label: 'Praia de Iracema', src: 'img/iracema.webp',          bg: 'linear-gradient(135deg,#8c1b16,#2a0b0a)' },
+    { label: 'Ponte dos Ingleses', src: 'img/ponte-dos-ingleses.webp', bg: 'linear-gradient(135deg,#e2d4b4,#b9a77f)' },
+    { label: 'Beira Mar',          src: 'img/beira-mar.jpg',          bg: 'linear-gradient(135deg,#1c5a3d,#0b241a)' },
+    { label: 'Mucuripe',           src: 'img/mucuripe.jpg',           bg: 'linear-gradient(135deg,#3a3a3a,#161616)' }
+  ];
+
+  (function () {
+    var link = document.getElementById('fortaleza');
+    var gal = document.getElementById('gallery');
+    var track = document.getElementById('gTrack');
+    var count = document.getElementById('gCount');
+    var n = photos.length, idx = 0, closeT, autoT;
+
+    photos.forEach(function (p) {
+      var s = document.createElement('div');
+      s.className = 'g-slide' + (p.dark ? ' dark' : '');
+      s.style.background = p.bg; // fundo de reserva, caso a foto não carregue
+      if (p.src) {
+        var img = document.createElement('img');
+        onLang(function () { img.alt = T(p.label); });
+      img.onerror = function () { this.remove(); }; // foto não encontrada: mostra o fundo colorido
+        img.src = p.src;
+        s.appendChild(img);
+      }
+      var cap = document.createElement('span'); onLang(function () { cap.textContent = T(p.label); });
+      s.appendChild(cap);
+      track.appendChild(s);
+    });
+
+    function go(i) {
+      idx = (i + n) % n;
+      track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+      count.textContent = (idx + 1) + ' / ' + n;
+    }
+    function startAuto() {
+      stopAuto();
+      if (!reduce) autoT = setInterval(function () { go(idx + 1); }, 3000);
+    }
+    function stopAuto() { clearInterval(autoT); }
+
+    function open() {
+      clearTimeout(closeT);
+      var r = link.getBoundingClientRect();
+      gal.style.left = Math.max(16, r.left) + 'px';
+      gal.style.bottom = (window.innerHeight - r.top + 14) + 'px';
+      gal.classList.add('open');
+      gal.setAttribute('aria-hidden', 'false');
+      startAuto();
+    }
+    function close() {
+      gal.classList.remove('open');
+      gal.setAttribute('aria-hidden', 'true');
+      stopAuto();
+    }
+    function scheduleClose() { closeT = setTimeout(close, 250); }
+
+    go(0);
+
+    link.addEventListener('mouseenter', open);
+    link.addEventListener('mouseleave', scheduleClose);
+    gal.addEventListener('mouseenter', function () { clearTimeout(closeT); });
+    gal.addEventListener('mouseleave', scheduleClose);
+    link.addEventListener('focus', open);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+
+    // celular (sem mouse): 1º toque abre a galeria, 2º toque segue o link
+    link.addEventListener('click', function (e) {
+      if (window.matchMedia('(hover: none)').matches && !gal.classList.contains('open')) {
+        e.preventDefault(); open();
+      }
+    });
+
+    document.getElementById('gPrev').addEventListener('click', function () { go(idx - 1); startAuto(); });
+    document.getElementById('gNext').addEventListener('click', function () { go(idx + 1); startAuto(); });
+    // toque/clique fora do balão fecha (no celular não existe "tirar o mouse")
+    document.addEventListener('click', function (e) {
+      if (gal.classList.contains('open') && !gal.contains(e.target) && !link.contains(e.target)) close();
+    });
+  })();
+
+  // ---- Bento grid de trabalhos ----
+  // Coloque as imagens na pasta img/ com estes nomes (ou troque o "src").
+  // Sem a imagem, aparece um bloco colorido com o nome do trabalho.
+  var works = [
+    { video: 'img/trabalho-01.mp4', src: 'img/trabalho-01.jpg', label: 'Trabalho 01',
+      alt: { pt: 'Animação 3D de um poço de pedra com telhado de madeira', en: '3D animation of a stone well with a wooden roof' },
+      bg: 'linear-gradient(135deg,#8f9d44,#e6e1c6)' },
+    { src: 'img/trabalho-02.jpg', label: 'Trabalho 02',
+      alt: { pt: 'Render 3D da traseira de um smartphone escuro com três câmeras', en: '3D render of the back of a dark smartphone with three cameras' },
+      bg: 'linear-gradient(135deg,#1b1b1b,#050505)' },
+    { src: 'img/trabalho-03.jpg', label: 'Trabalho 03',
+      alt: { pt: 'Render 3D de uma garrafa de vinho tinto com rótulo Uve Nobili', en: '3D render of a red wine bottle with a Uve Nobili label' },
+      bg: 'linear-gradient(160deg,#3a1018,#050505)' },
+    { video: 'img/trabalho-04.mp4', src: 'img/trabalho-04.jpg', label: 'Trabalho 04',
+      alt: { pt: 'Animação 3D do Pokémon Dugtrio em um gramado', en: '3D animation of the Pokémon Dugtrio on a grassy field' },
+      title: 'Pokémon - Dugtrio', kicker: '3D',
+      process: {
+        pt: [
+          'Sempre fui fã de Pokémon, e o Dugtrio é uma das evoluções que mais me divertem. Sua forma simples e levemente misteriosa, com um nariz que, visto de frente, também pode ser lido como uma boca, despertou em mim a vontade de recriá-lo no Blender com um shading mais cartoon.'
+        ],
+        en: [
+          'I have always been a Pokémon fan, and Dugtrio is one of the evolutions I find most amusing. Its simple, slightly mysterious shape, with a nose that can also read as a mouth when seen head-on, made me want to recreate it in Blender with a more cartoon-style shading.'
+        ]
+      },
+      gallery: [
+        { src: 'img/criaturas-01.jpg', bg: 'linear-gradient(135deg,#3a3a3a,#161616)',
+          alt: { pt: 'Modelo 3D em cinza dos três Dugtrio sobre um gramado, ainda sem cores', en: 'Grey 3D model of the three Dugtrio on a grassy field, before colour' } },
+        { src: 'img/criaturas-02.jpg', bg: 'linear-gradient(135deg,#4f7a2f,#1a2c0f)',
+          alt: { pt: 'Primeira versão com cores e texturas, com o céu ainda desfocado', en: 'First coloured and textured version, with a blurred sky' } },
+        { src: 'img/criaturas-03.jpg', bg: 'linear-gradient(135deg,#2f6f6b,#12302e)',
+          alt: { pt: 'Versão final com céu em tons de turquesa e gramado estilizado', en: 'Final version with a turquoise sky and stylised grass' } },
+        { src: 'img/criaturas-04.jpg', bg: 'linear-gradient(135deg,#8a5a70,#2e1a26)',
+          alt: { pt: 'Comparativo dividido na diagonal entre o modelo cinza e o render final', en: 'Diagonal split comparing the grey model and the final render' } }
+      ] },
+    { src: 'img/trabalho-05.jpg', label: 'Trabalho 05',
+      alt: { pt: 'Embalagem de perfume de banho Bercelle em fundo rosa', en: 'Bercelle bath perfume packaging on a pink background' },
+      bg: 'linear-gradient(135deg,#e8a597,#c87668)' }
+  ];
+
+  (function () {
+    var bento = document.getElementById('bento');
+    var videos = [];
+
+    function buildInner(w, decorative) {
+      var inner = document.createElement('div');
+      inner.className = 'tile-in';
+      inner.style.background = w.bg;
+      var cap = document.createElement('span');
+      cap.textContent = w.label;
+      inner.appendChild(cap);
+      if (w.video) {
+        // vídeo em reprodução automática: mudo, em loop e sem tela cheia (exigências dos navegadores)
+        var v = document.createElement('video');
+        v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true;
+        v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
+        v.preload = 'auto';
+        if (w.src) v.poster = w.src; // primeiro quadro enquanto o vídeo carrega
+        if (decorative) v.setAttribute('aria-hidden', 'true'); else onLang(function () { v.setAttribute('aria-label', T(w.alt)); });
+        if (!reduce) v.autoplay = true; // com "movimento reduzido" fica só o primeiro quadro
+        v.src = w.video;
+        inner.appendChild(v);
+        videos.push(v);
+      } else if (w.src) {
+        var img = document.createElement('img');
+        onLang(function () { img.alt = decorative ? '' : T(w.alt); });
+      img.onerror = function () { this.remove(); }; // imagem não encontrada: fica o bloco colorido
+        img.src = w.src;
+        inner.appendChild(img);
+      }
+      return inner;
+    }
+
+    // ---- Legenda no hover + modal do trabalho ----
+    var ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>';
+    var modal = document.getElementById('modal');
+    var mTrack = document.getElementById('mTrack');
+    var mDots = document.getElementById('mDots');
+    var mGallery = document.getElementById('mGallery');
+    var mViewport = document.getElementById('mViewport');
+    var m = { n: 0, idx: 0, busy: false, timer: null, last: null };
+
+    function makeSlide(g, i, decorative) {
+      var s = document.createElement('div');
+      s.className = 'm-slide';
+      s.style.background = g.bg || '#222';
+      s.appendChild(document.createTextNode(UIS('image') + (i + 1)));
+      if (g.src) {
+        var im = document.createElement('img');
+        im.alt = decorative ? '' : (T(g.alt) || '');
+        im.draggable = false;
+        im.onerror = function () { this.remove(); };
+        im.src = g.src;
+        s.appendChild(im);
+      }
+      if (decorative) s.setAttribute('aria-hidden', 'true');
+      return s;
+    }
+    function setX(animate) {
+      mTrack.style.transition = animate ? '' : 'none';
+      mTrack.style.transform = 'translateX(-' + (m.idx * 100) + '%)';
+    }
+    function fixIdx() {
+      // carrossel infinito: nas pontas (cópias) volta, sem animação, para a imagem verdadeira
+      var jumped = false;
+      if (m.idx === 0) { m.idx = m.n; jumped = true; }
+      else if (m.idx === m.n + 1) { m.idx = 1; jumped = true; }
+      if (jumped) { setX(false); void mTrack.offsetWidth; }
+    }
+    function updateDots() {
+      var cur = (m.idx - 1 + m.n) % m.n;
+      Array.prototype.forEach.call(mDots.children, function (d, i) { d.className = (i === cur) ? 'on' : ''; });
+    }
+    function go(d) {
+      if (m.n < 2 || m.busy) return;
+      m.busy = !reduce;
+      m.idx += d;
+      setX(true);
+      if (reduce) fixIdx();
+      updateDots();
+    }
+    mTrack.addEventListener('transitionend', function (e) {
+      if (e.target !== mTrack) return;
+      m.busy = false; fixIdx(); updateDots();
+    });
+    function startAuto() {
+      stopAuto();
+      if (!reduce && m.n > 1) m.timer = setInterval(function () { go(1); }, 4500);
+    }
+    function stopAuto() { clearInterval(m.timer); }
+
+    function renderModalText(w) {
+      document.getElementById('mKicker').textContent = T(w.kicker) || '';
+      document.getElementById('mTitle').textContent = T(w.title);
+      var body = document.getElementById('mBody');
+      body.textContent = '';
+      (T(w.process) || []).forEach(function (t) {
+        var p = document.createElement('p'); p.textContent = t; body.appendChild(p);
+      });
+    }
+    function buildSlides(list, startIdx) {
+      m.n = list.length; m.idx = m.n > 1 ? (startIdx || 1) : 0; m.busy = false;
+      mTrack.textContent = ''; mDots.textContent = '';
+      if (m.n > 1) mTrack.appendChild(makeSlide(list[m.n - 1], m.n - 1, true)); // cópia da última
+      list.forEach(function (g, i) { mTrack.appendChild(makeSlide(g, i, false)); });
+      if (m.n > 1) mTrack.appendChild(makeSlide(list[0], 0, true));             // cópia da primeira
+      list.forEach(function () { mDots.appendChild(document.createElement('i')); });
+      mGallery.style.display = m.n ? '' : 'none';
+      document.getElementById('mPrev').style.display = document.getElementById('mNext').style.display = m.n > 1 ? '' : 'none';
+      setX(false); void mTrack.offsetWidth; if (m.n) updateDots();
+    }
+    // trocar o idioma com o modal aberto atualiza texto e legendas sem fechar
+    onLang(function () {
+      if (modal.classList.contains('open') && m.work) { renderModalText(m.work); buildSlides(m.work.gallery || [], m.idx); }
+    });
+
+    function openModal(w, from) {
+      m.last = from; m.work = w;
+      renderModalText(w);
+      buildSlides(w.gallery || [], 1);
+
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.documentElement.style.overflow = 'hidden';
+      document.getElementById('mClose').focus({ preventScroll: true });
+      startAuto();
+    }
+    function closeModal() {
+      if (!modal.classList.contains('open')) return;
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.documentElement.style.overflow = '';
+      stopAuto();
+      if (m.last && m.last.focus) m.last.focus({ preventScroll: true });
+    }
+
+    document.getElementById('mClose').addEventListener('click', closeModal);
+    document.getElementById('mBackdrop').addEventListener('click', closeModal);
+    document.getElementById('mPrev').addEventListener('click', function () { go(-1); startAuto(); });
+    document.getElementById('mNext').addEventListener('click', function () { go(1); startAuto(); });
+    mGallery.addEventListener('mouseenter', stopAuto);
+    mGallery.addEventListener('mouseleave', function () { if (modal.classList.contains('open')) startAuto(); });
+
+    // arrastar / deslizar o dedo
+    var sx = null;
+    mViewport.addEventListener('pointerdown', function (e) { sx = e.clientX; });
+    mViewport.addEventListener('pointerup', function (e) {
+      if (sx === null) return;
+      var dx = e.clientX - sx; sx = null;
+      if (Math.abs(dx) > 50) { go(dx < 0 ? 1 : -1); startAuto(); }
+    });
+    mViewport.addEventListener('pointercancel', function () { sx = null; });
+
+    document.addEventListener('keydown', function (e) {
+      if (!modal.classList.contains('open')) return;
+      if (e.key === 'Escape') closeModal();
+      else if (e.key === 'ArrowRight') { go(1); startAuto(); }
+      else if (e.key === 'ArrowLeft') { go(-1); startAuto(); }
+      else if (e.key === 'Tab') { // mantém o foco dentro do modal
+        var f = Array.prototype.filter.call(modal.querySelectorAll('button'), function (b) { return b.offsetParent !== null; });
+        if (!f.length) return;
+        var first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    });
+
+    // transforma um card em "abrível": legenda que sobe no hover + clique abre o modal
+    function makeOpenable(el, w, decorative) {
+      if (!w.title) return;
+      el.classList.add('openable');
+      var cap = document.createElement('div');
+      cap.className = 'tile-cap';
+      var t = document.createElement('span');
+      t.className = 'tile-title'; onLang(function () { t.textContent = T(w.title); });
+      cap.appendChild(t);
+      cap.insertAdjacentHTML('beforeend', ARROW);
+      el.appendChild(cap);
+      el.addEventListener('click', function () { openModal(w, el); });
+      if (decorative) return; // cópia escondida do carrossel: só toque/clique, sem foco de teclado
+      el.tabIndex = 0;
+      el.setAttribute('role', 'button');
+      el.setAttribute('aria-haspopup', 'dialog');
+      onLang(function () { el.setAttribute('aria-label', UIS('open') + T(w.title)); });
+      el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(w, el); }
+      });
+    }
+
+    var tiles = works.map(function (w, i) {
+      var f = document.createElement('figure');
+      f.className = 'tile t' + (i + 1);
+      f.style.transitionDelay = (i * 90) + 'ms';
+      f.appendChild(buildInner(w, false));
+      makeOpenable(f, w, false);
+      bento.appendChild(f);
+      return f;
+    });
+
+    // Carrossel infinito (celular): o mesmo conjunto duas vezes; o trilho desliza metade e reinicia
+    var carousel = document.getElementById('carousel');
+    var cTrack = document.createElement('div');
+    cTrack.className = 'c-track';
+    [false, true].forEach(function (copy) {
+      var g = document.createElement('div');
+      g.className = 'c-group';
+      if (copy) g.setAttribute('aria-hidden', 'true');
+      works.forEach(function (w) {
+        var item = document.createElement('div');
+        item.className = 'c-item';
+        item.appendChild(buildInner(w, copy));
+        makeOpenable(item, w, copy); // as duas cópias abrem o modal ao tocar
+        g.appendChild(item);
+      });
+      cTrack.appendChild(g);
+    });
+    carousel.appendChild(cTrack);
+    function setCarouselSpeed() {
+      // cada item ocupa 62vw + 3vw de espaço; velocidade constante de ~45 px/s
+      var groupWidth = works.length * 0.65 * window.innerWidth;
+      cTrack.style.animationDuration = (groupWidth / 45) + 's';
+    }
+    setCarouselSpeed();
+    window.addEventListener('resize', setCarouselSpeed);
+
+    // toca os vídeos só enquanto estão na tela (economiza bateria e dados)
+    if (!reduce && 'IntersectionObserver' in window) {
+      var vio = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { var p = e.target.play(); if (p && p.catch) p.catch(function () {}); }
+          else { e.target.pause(); }
+        });
+      }, { threshold: 0.1 });
+      videos.forEach(function (v) { vio.observe(v); });
+    }
+
+    // entrada suave dos blocos ao rolar a página
+    if (reduce || !('IntersectionObserver' in window)) {
+      tiles.forEach(function (t) { t.classList.add('in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.15 });
+    tiles.forEach(function (t) { io.observe(t); });
+  })();
+
+
+  // ---- Currículo: faixas do Instagram, colagem do site e animação ao rolar ----
+  // As imagens ficam na pasta img/ com estes nomes. Sem a imagem, aparece um bloco colorido.
+  (function () {
+    function slot(cls, it, color, altKey, decorative) {
+      var d = document.createElement('div');
+      d.className = cls;
+      d.style.background = it.bg; d.style.color = color;
+      var span = document.createElement('span'); span.textContent = it.label; d.appendChild(span);
+      var img = document.createElement('img');
+      img.onload = function () { span.style.display = 'none'; };
+      img.onerror = function () { this.remove(); }; // imagem não encontrada: fica o bloco colorido
+      onLang(function () { img.alt = decorative ? '' : UIS(altKey); });
+      img.src = it.src;
+      d.appendChild(img);
+      return d;
+    }
+    function make(prefix, n, bgs, label) {
+      var out = [];
+      for (var i = 1; i <= n; i++) {
+        var k = (i < 10 ? '0' : '') + i;
+        out.push({ src: 'img/' + prefix + '-' + k + '.jpg', label: label + ' ' + k, bg: bgs[(i - 1) % bgs.length] });
+      }
+      return out;
+    }
+    var gwa = make('gwa', 7, ['#e9edf7', '#efe6fa', '#fde9d8', '#e1eefc'], 'Post');
+    var vertas = make('vertas', 9, ['#e8f3ea', '#d9ecf7', '#f6e9dc'], 'Post');
+    var srv = make('srv', 7, ['#1747c7', '#2b64e8', '#0e2f8f', '#4a82f0'], 'Post');
+
+    function strip(id, items, color, altKey, reverse) {
+      var el = document.getElementById(id);
+      if (reverse) el.classList.add('rev');
+      var track = document.createElement('div');
+      track.className = 's-track';
+      [false, true].forEach(function (copy) {
+        var g = document.createElement('div');
+        g.className = 's-group';
+        if (copy) g.setAttribute('aria-hidden', 'true');
+        items.forEach(function (it) { g.appendChild(slot('post', it, color, altKey, copy)); });
+        track.appendChild(g);
+      });
+      el.appendChild(track);
+      function speed() { // velocidade constante, ~45 px por segundo
+        var w = track.firstChild.getBoundingClientRect().width;
+        if (w) track.style.animationDuration = (w / 45) + 's';
+      }
+      speed();
+      window.addEventListener('resize', speed);
+    }
+    strip('stripGwa', gwa, '#3a3a4a', 'altGwa', false);
+    strip('stripVertas', vertas, '#3a3a4a', 'altVertas', true);
+    strip('stripSrv', srv, '#ffffff', 'altSrv', false);
+
+
+    // blocos aparecem ao rolar; os títulos usam a mesma animação de letras do início
+    var blocks = Array.prototype.slice.call(document.querySelectorAll('.rv'));
+    if (reduce || !('IntersectionObserver' in window)) {
+      blocks.forEach(function (b) { b.classList.add('in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+        Array.prototype.forEach.call(e.target.querySelectorAll('.scr'), function (h) {
+          scramble(h, UIS(h.getAttribute('data-i18n')), FRAMES);
+        });
+      });
+    }, { threshold: 0.01, rootMargin: '0px 0px -8% 0px' });
+    blocks.forEach(function (b) { io.observe(b); });
+  })();
+
+
+  // ---- Comparador antes/depois do cartão ----
+  (function () {
+    var ba = document.getElementById('ba');
+    if (!ba) return;
+    var pos = 50;
+    function set(p) {
+      pos = Math.max(0, Math.min(100, p));
+      ba.style.setProperty('--pos', pos + '%');
+      ba.setAttribute('aria-valuenow', Math.round(pos));
+    }
+    function fromX(x) { var r = ba.getBoundingClientRect(); set(((x - r.left) / r.width) * 100); }
+    var dragging = false, touched = false;
+    ba.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { touched = true; fromX(e.clientX); } });
+    ba.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'mouse' || dragging) { touched = true; fromX(e.clientX); }
+    });
+    ba.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse') return;
+      dragging = true; touched = true; ba.classList.add('drag');
+      try { ba.setPointerCapture(e.pointerId); } catch (_) {}
+      fromX(e.clientX);
+    });
+    function end() { dragging = false; ba.classList.remove('drag'); }
+    ba.addEventListener('pointerup', end); ba.addEventListener('pointercancel', end);
+    ba.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') { set(pos - 5); e.preventDefault(); }
+      else if (e.key === 'ArrowRight') { set(pos + 5); e.preventDefault(); }
+      else if (e.key === 'Home') { set(0); e.preventDefault(); }
+      else if (e.key === 'End') { set(100); e.preventDefault(); }
+    });
+    // ao aparecer na tela, a divisória faz um pequeno vai e vem para mostrar que é interativa
+    if (!reduce && 'IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (en) {
+        if (!en[0].isIntersecting) return;
+        io.disconnect();
+        var t0 = null;
+        (function step(t) {
+          if (touched) return;
+          if (t0 === null) t0 = t;
+          var k = Math.min(1, (t - t0) / 1600);
+          set(50 + Math.sin(k * Math.PI * 2) * 22 * (1 - k));
+          if (k < 1) requestAnimationFrame(step); else set(50);
+        })(performance.now());
+      }, { threshold: 0.6 });
+      io.observe(ba);
+    }
+  })();
+
+
+  // ---- Ícones nos títulos e rotação ligada à rolagem ----
+  (function () {
+    Array.prototype.forEach.call(document.querySelectorAll('.h2'), function (h, i) {
+      h.classList.add('has-ico');
+      h.style.setProperty('--ico', 'url(' + ICONS[i % ICONS.length].src + ')');
+      h.style.setProperty('--dir', i % 2 ? 'reverse' : 'normal');
+    });
+    var big = document.getElementById('bigIco');
+    if (big) big.src = ICONS[0].src;
+    if (reduce) return;
+    var ticking = false;
+    function upd() {
+      document.documentElement.style.setProperty('--rot', (window.scrollY * 0.12).toFixed(1));
+      ticking = false;
+    }
+    window.addEventListener('scroll', function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(upd); }
+    }, { passive: true });
+    upd();
+  })();
+
+  // ---- Seletor PT / EN ----
+  Array.prototype.forEach.call(document.querySelectorAll('.lang [data-lang]'), function (b) {
+    b.addEventListener('click', function () { setLang(b.getAttribute('data-lang'), true); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.lang-switch'), function (sw) {
+    sw.addEventListener('click', function () { setLang(LANG === 'pt' ? 'en' : 'pt', true); });
+  });
+  setLang(LANG, false);
+</script>
+</body>
+</html>
