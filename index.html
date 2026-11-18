@@ -838,7 +838,7 @@
     });
     function startAuto() {
       stopAuto();
-      if (!reduce && m.n > 1) m.timer = setInterval(function () { go(1); }, 4500);
+      if (!reduce && m.n > 1) m.timer = setInterval(function () { go(1); }, 2000);
     }
     function stopAuto() { clearInterval(m.timer); }
 
@@ -891,8 +891,6 @@
     document.getElementById('mBackdrop').addEventListener('click', closeModal);
     document.getElementById('mPrev').addEventListener('click', function () { go(-1); startAuto(); });
     document.getElementById('mNext').addEventListener('click', function () { go(1); startAuto(); });
-    mGallery.addEventListener('mouseenter', stopAuto);
-    mGallery.addEventListener('mouseleave', function () { if (modal.classList.contains('open')) startAuto(); });
 
     // arrastar / deslizar o dedo
     var sx = null;
